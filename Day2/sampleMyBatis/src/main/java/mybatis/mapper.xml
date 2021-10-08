@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="mybatis.mapper">
+    
+<!-- 
+    <insert parameterType="Object" resultType="Object">
+        INSERT INTO HUMAN(ID, PWD, NAME)
+        VALUES(#{id}, #{pwd}, #{name})
+    </insert>
+    
+    <delete
+    
+    <select
+    
+    <update
+
+ -->    
+
+<insert id="add" parameterType="dto.UserDto">
+    INSERT INTO USERDTO(ID, NAME, AGE, JOINDATE)
+    VALUES(#{id}, #{name}, #{age}, SYSDATE)
+</insert>    
+
+<update id="update" parameterType="dto.UserDto">
+    UPDATE USERDTO 
+    SET AGE=#{age} 
+    WHERE NAME=#{name}
+</update>
+
+<select id="search" parameterType="String" resultType="dto.UserDto">
+    SELECT *
+    FROM USERDTO
+    WHERE ID=#{id}
+</select>
+
+<select id="dataAll" resultType="dto.UserDto">
+    SELECT *
+    FROM USERDTO
+</select>
+
+<select id="bbslist" parameterType="dto.BbsParam" resultType="dto.BbsDto">
+    SELECT *
+    FROM BBS
+    <if test="choice == 'title'">
+        WHERE TITLE LIKE '%' || #{search} || '%'
+    </if>
+    <if test="choice == 'content'">
+        WHERE CONTENT LIKE '%' || #{search} || '%'
+    </if>
+    <if test="choice == 'id'">
+        WHERE ID=#{search}
+    </if>
+    ORDER BY REF DESC, STEP ASC
+    
+</select>
+    
+</mapper>
+
+
+
+
+
+
+
+
+  
