@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+    
+    <!-- spring MVC annotation(주석문, 지시어)을 사용하기 위한 설정 -->
+    <context:annotation-config/>
+    
+    <!-- 사용자의 view의 위치와 확장명을 설정 -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <!-- InternalResourceViewResolver는 Controller에서 return된 ModelAndView 객체에서 선언된 view page를 지정해주는 class이다. -->
+    <!-- 실질적인 jsp를 호출하는데 필요한 친구이다. -->
+        <property name="prefix" value="/WEB-INF/views/"></property> <!-- views(jsp, html)의 경로 -->
+        <property name="suffix" value=".jsp"></property>  <!-- 확장자명은 jsp -->
+    </bean>
+    <!-- InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+         viewResolver.prefix = "/WEB-INF/views";
+     -->
+     
+     <context:component-scan base-package="mul.com.a"/>
+
+</beans>
