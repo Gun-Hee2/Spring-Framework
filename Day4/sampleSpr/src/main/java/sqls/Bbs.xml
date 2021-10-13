@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- sql 쿼리문을 작성하는 xml -->  
+
+<mapper namespace="Bbs">
+    
+<select id="bbslist" parameterType="mul.com.a.dto.BbsParam" resultType="mul.com.a.dto.BbsDto">
+    SELECT SEQ, ID, REF, STEP, DEPTH, TITLE, CONTENT, WDATE, DEL, READCOUNT
+	FROM (SELECT 	ROW_NUMBER()OVER(ORDER BY REF DESC, STEP ASC) AS RNUM,
+				SEQ, ID, REF, STEP, DEPTH, 
+				TITLE, CONTENT, WDATE, 
+				DEL, READCOUNT
+		FROM BBS
+	<if test="choice == 'title'">
+        WHERE TITLE LIKE '%' || #{ search } || '%'
+    </if>
+    <if test="choice == 'content'">
+        WHERE CONTENT LIKE '%' || #{ search } || '%'
+    </if>
+    <if test="choice == 'id'">
+        WHERE ID=#{ search }
+    </if>
+	ORDER BY REF DESC, STEP ASC)
+	WHERE RNUM BETWEEN #{start} AND #{end}
+</select>    
+
+<select id="AllBbs" parameterType="mul.com.a.dto.BbsParam" resultType="java.lang.Integer">
+    SELECT COUNT(*)  
+	FROM BBS 
+	<if test="choice == 'title'">
+        WHERE TITLE LIKE '%' || #{ search } || '%'
+    </if>
+    <if test="choice == 'content'">
+        WHERE CONTENT LIKE '%' || #{ search } || '%'
+    </if>
+    <if test="choice == 'id'">
+        WHERE ID=#{ search }
+    </if>
+	ORDER BY REF DESC, STEP ASC
+</select>    
+
+<insert id="writeBbs" parameterType="mul.com.a.dto.BbsDto">
+    INSERT INTO BBS 
+				(SEQ, ID, 
+				REF, STEP, DEPTH, 
+				TITLE, CONTENT, WDATE, DEL, READCOUNT) 
+				VALUES
+				(SEQ_BBS.NEXTVAL, #{ id }, 
+				(SELECT NVL(MAX(REF), 0)+1 FROM BBS), 0, 0,
+				#{ title }, #{ content }, SYSDATE, 0, 0)
+</insert>
+
+<update id="readcount" parameterType="Integer">
+    UPDATE BBS 
+    SET READCOUNT=READCOUNT + 1 
+    WHERE SEQ=#{ seq }
+</update>
+
+<select id="getBbs" parameterType="Integer" resultType="mul.com.a.dto.BbsDto">
+    SELECT SEQ, ID, REF, STEP, DEPTH, 
+    	   TITLE, CONTENT, WDATE, DEL, READCOUNT 
+	FROM BBS 
+	WHERE SEQ=#{ seq }
+</select>
+
+<update id="answerup" parameterType="mul.com.a.dto.BbsDto">
+    UPDATE BBS 
+    SET STEP=STEP+1 
+    WHERE REF = (SELECT REF FROM BBS WHERE SEQ=#{ seq } )
+    AND STEP > (SELECT STEP FROM BBS WHERE SEQ=#{ seq } )
+</update>
+
+<insert id="answerin" parameterType="mul.com.a.dto.BbsDto">
+    INSERT INTO BBS(SEQ, ID,  
+                    REF, STEP, DEPTH, 
+                    TITLE, CONTENT, WDATE, DEL, READCOUNT) 
+    VALUES(SEQ_BBS.NEXTVAL, #{ id }, 
+    (SELECT REF FROM BBS WHERE SEQ=#{ seq } ),
+    (SELECT STEP FROM BBS WHERE SEQ=#{ seq } ) + 1, 
+    (SELECT DEPTH FROM BBS WHERE SEQ=#{ seq } ) + 1, 
+    #{ title }, #{ content }, SYSDATE, 0, 0)
+</insert>
+
+<update id="updateBbs" parameterType="mul.com.a.dto.BbsDto">
+    UPDATE BBS 
+    SET TITLE=#{ title }, 
+        CONTENT=#{ content }
+    WHERE SEQ=#{ seq }
+</update>
+
+<update id="deleteBbs" parameterType="Integer">
+    UPDATE BBS 
+    SET DEL=1 
+    WHERE SEQ=#{seq}
+</update>
+
+</mapper>
+
+
+
+
+
+
+
+
